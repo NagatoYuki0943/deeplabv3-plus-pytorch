@@ -46,7 +46,7 @@ class Block(nn.Module):
             self.head_relu = False
         else:
             self.skip=None
-        
+
         self.hook_layer = None
         if grow_first:
             filters = out_filters
@@ -57,7 +57,7 @@ class Block(nn.Module):
         self.sepconv3 = SeparableConv2d(out_filters,out_filters,3,stride=strides,padding=1*atrous[2],dilation=atrous[2],bias=False,activate_first=activate_first,inplace=inplace)
 
     def forward(self,inp):
-        
+
         if self.skip is not None:
             skip = self.skip(inp)
             skip = self.skipbn(skip)
@@ -91,11 +91,11 @@ class Xception(nn.Module):
         elif downsample_factor == 16:
             stride_list = [2,2,1]
         else:
-            raise ValueError('xception.py: output stride=%d is not supported.'%os) 
+            raise ValueError('xception.py: output stride=%d is not supported.'%os)
         self.conv1 = nn.Conv2d(3, 32, 3, 2, 1, bias=False)
         self.bn1 = nn.BatchNorm2d(32, momentum=bn_mom)
         self.relu = nn.ReLU(inplace=True)
-        
+
         self.conv2 = nn.Conv2d(32,64,3,1,1,bias=False)
         self.bn2 = nn.BatchNorm2d(64, momentum=bn_mom)
         #do relu here
@@ -124,7 +124,7 @@ class Xception(nn.Module):
         self.block17=Block(728,728,1,atrous=[1*rate,1*rate,1*rate])
         self.block18=Block(728,728,1,atrous=[1*rate,1*rate,1*rate])
         self.block19=Block(728,728,1,atrous=[1*rate,1*rate,1*rate])
-        
+
         self.block20=Block(728,1024,stride_list[2],atrous=rate,grow_first=False)
         self.conv3 = SeparableConv2d(1024,1536,3,1,1*rate,dilation=rate,activate_first=False)
 
@@ -151,7 +151,7 @@ class Xception(nn.Module):
         x = self.conv2(x)
         x = self.bn2(x)
         x = self.relu(x)
-        
+
         x = self.block1(x)
         x = self.block2(x)
         low_featrue_layer = self.block2.hook_layer
@@ -172,12 +172,12 @@ class Xception(nn.Module):
         x = self.block17(x)
         x = self.block18(x)
         x = self.block19(x)
-        x = self.block20(x)       
+        x = self.block20(x)
 
         x = self.conv3(x)
 
         x = self.conv4(x)
-        
+
         x = self.conv5(x)
         return low_featrue_layer,x
 
