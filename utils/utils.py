@@ -1,4 +1,7 @@
+import random
+
 import numpy as np
+import torch
 from PIL import Image
 
 #---------------------------------------------------------#
@@ -36,6 +39,27 @@ def get_lr(optimizer):
     for param_group in optimizer.param_groups:
         return param_group['lr']
 
+#---------------------------------------------------#
+#   设置种子
+#---------------------------------------------------#
+def seed_everything(seed=11):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+#---------------------------------------------------#
+#   设置Dataloader的种子
+#---------------------------------------------------#
+def worker_init_fn(worker_id, rank, seed):
+    worker_seed = rank + seed
+    random.seed(worker_seed)
+    np.random.seed(worker_seed)
+    torch.manual_seed(worker_seed)
+
 def preprocess_input(image):
     image /= 255.0
     return image
@@ -52,13 +76,13 @@ def show_config(**kwargs):
 def download_weights(backbone, model_dir="./model_data"):
     import os
     from torch.hub import load_state_dict_from_url
-    
+
     download_urls = {
         'mobilenet' : 'https://github.com/bubbliiiing/deeplabv3-plus-pytorch/releases/download/v1.0/mobilenet_v2.pth.tar',
         'xception'  : 'https://github.com/bubbliiiing/deeplabv3-plus-pytorch/releases/download/v1.0/xception_pytorch_imagenet.pth',
     }
     url = download_urls[backbone]
-    
+
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
     load_state_dict_from_url(url, model_dir)
