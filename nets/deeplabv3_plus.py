@@ -74,7 +74,7 @@ class MobileNetV2(nn.Module):
 #                                     │
 #       ┌──────────────┬──────────────┼──────────────┬──────────────┐
 #       │              │              │              │              │
-#    1x1Conv        3x3Conv        3x3Conv        3x3Conv    AdaptiveMaxPool2d
+#    1x1Conv        3x3Conv        3x3Conv        3x3Conv    AdaptiveAvgPool2d
 #       │          dilation=6    dilation=12    dilation=18         │
 #       │              │              │              │              │
 #       │              │              │              │           1x1Conv
